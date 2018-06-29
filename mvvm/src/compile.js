@@ -1,3 +1,5 @@
+import Watcher from './watcher'
+
 function isElementNode (node) {
   return node.nodeType === 1
 }
@@ -64,6 +66,15 @@ const CompileUtil = {
       return pre[next]
     }, vm.$data)
   },
+  setVal (vm, expr, value) {
+    expr = expr.split('.')
+    return expr.reduce((pre, next, currentIndex) => {
+      if (currentIndex === expr.length - 1) {
+        return pre[next] = value
+      }
+      return pre[next]
+    }, vm.$data)
+  },
   getTextVal (vm, text) {
     return text.replace(/\{\{([^}]+)\}\}/g, (...args) => {
       return this.getVal(vm, args[1].trim())
@@ -72,10 +83,22 @@ const CompileUtil = {
   text (node, vm, text) {
     const updateFn = this.updater['textUpdater']
     const value = this.getTextVal(vm, text)
+    text.replace(/\{\{([^}]+)\}\}/g, (...args) => {
+      new Watcher(vm, args[1].trim(), newVal => {
+        const updateFn = this.updater['textUpdater']
+        updateFn(node, this.getTextVal(vm, newVal))
+      })
+    })
     updateFn(node, value)
   },
   model (node, vm, expr) {
     const updateFn = this.updater['modelUpdater']
+    new Watcher(vm, expr, newVal => {
+      updateFn(node, newVal)
+    })
+    node.addEventListener('input', e => {
+      this.setVal(vm, expr, e.target.value)
+    })
     updateFn(node, this.getVal(vm, expr))
   },
   updater: {
@@ -87,3 +110,4 @@ const CompileUtil = {
     }
   }
 }
+
