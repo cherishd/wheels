@@ -1,3 +1,5 @@
+import { isString } from './util'
+
 export default class Element {
   constructor (tag, props, children, key) {
     this.tag = tag
@@ -13,13 +15,18 @@ export default class Element {
     }
   }
 
-  render () {
+  create () {
     const root = this._createElement(
       this.tag,
       this.props,
       this.children,
       this.key
     )
+    return root
+  }
+
+  render () {
+    const root = this.create()
     document.body.appendChild(root)
     return root
   }
@@ -39,13 +46,13 @@ export default class Element {
         let element
         if (child instanceof Element) {
           element = this._createElement(
-            element.tag,
-            element.props,
-            element.children,
-            element.key
+            child.tag,
+            child.props,
+            child.children,
+            child.key
           )
         } else {
-          element = document.createTextNode(element)
+          element = document.createTextNode(child)
         }
         el.appendChild(element)
       })
