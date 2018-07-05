@@ -1,10 +1,10 @@
 export const State = {
-  ChangeText: 0,
-  ChangeProps: 1,
-  Insert: 2,
-  Move: 3,
-  Remove: 4,
-  Replace: 5
+  ChangeText: 'CHANGE_TEXT',
+  ChangeProps: 'CHANGE_PROPS',
+  Insert: 'INSERT',
+  Move: 'MOVE',
+  Remove: 'REMOVE',
+  Replace: 'REPLACE'
 }
 
 export function isString (str) {
